@@ -1,0 +1,81 @@
+@page "/register"
+@layout Layout.AuthLayout
+@rendermode InteractiveServer
+@using WebApp.Models.Auth
+
+<PageTitle>Register</PageTitle>
+
+<div class="auth-card">
+    <div class="auth-card-header">
+        <h3>REGISTER</h3>
+    </div>
+    <div class="auth-card-body">
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <div class="alert-danger" role="alert">
+                @_errorMessage
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(_successMessage))
+        {
+            <div class="alert-success" role="alert">
+                @_successMessage
+            </div>
+        }
+
+        <EditForm Model="_registerModel" OnValidSubmit="HandleRegister" FormName="RegisterForm">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <InputText id="username" @bind-Value="_registerModel.Username" class="form-control"
+                           placeholder="Choose a username" />
+                <ValidationMessage For="() => _registerModel.Username" class="text-danger" />
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <InputText id="email" @bind-Value="_registerModel.Email" type="email" class="form-control"
+                           placeholder="Enter your email" />
+                <ValidationMessage For="() => _registerModel.Email" class="text-danger" />
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <InputText id="password" @bind-Value="_registerModel.Password" type="password"
+                           class="form-control" placeholder="Choose a password (min 6 chars)" />
+                <ValidationMessage For="() => _registerModel.Password" class="text-danger" />
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <InputText id="confirmPassword" @bind-Value="_confirmPassword" type="password"
+                           class="form-control" placeholder="Confirm your password" />
+            </div>
+
+            <button type="submit" class="btn-primary" disabled="@_isLoading">
+                @if (_isLoading)
+                {
+                    <span>Loading...</span>
+                }
+                else
+                {
+                    <span>Register</span>
+                }
+            </button>
+        </EditForm>
+
+        <hr />
+
+        <div class="text-center">
+            <p>Already have an account? <a href="/login">Login here</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-group {
+        margin-bottom: 1rem;
+    }
+</style>

@@ -1,0 +1,56 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@using WebApp.Services
+@using WebApp.ViewModels
+@inject HomeViewModel VM
+@inject CustomAuthStateProvider AuthStateProvider
+
+<PageTitle>Blocks - Dashboard</PageTitle>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Sites</div>
+        <div class="stat-value">@VM.SiteCount</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Batches</div>
+        <div class="stat-value">@VM.BatchCount</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Blocks</div>
+        <div class="stat-value">@VM.TotalBlocks.ToString("N0")</div>
+    </div>
+</div>
+
+<div class="flex gap-md" style="flex-wrap: wrap;">
+    <a href="/site" class="card" style="flex: 1; min-width: 280px; text-decoration: none; color: inherit;">
+        <div class="card-header">
+            <h3 class="card-title">Sites</h3>
+            <span class="badge">@VM.SiteCount</span>
+        </div>
+        <p class="text-muted">Manage construction sites and locations</p>
+    </a>
+
+    <a href="/batch-calculator" class="card" style="flex: 1; min-width: 280px; text-decoration: none; color: inherit;">
+        <div class="card-header">
+            <h3 class="card-title">Batches</h3>
+            <span class="badge">@VM.BatchCount</span>
+        </div>
+        <p class="text-muted">Track block batches and quantities</p>
+    </a>
+</div>
+
+@code {
+    private bool _dataLoaded;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_dataLoaded)
+        {
+            await AuthStateProvider.GetAuthenticationStateAsync();
+            await VM.LoadAsync();
+            _dataLoaded = true;
+            StateHasChanged();
+        }
+    }
+}

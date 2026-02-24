@@ -1,0 +1,33 @@
+@API_HostAddress = http://localhost:5065
+
+### 🧪 Test endpoint - just to check the API is alive
+GET {{API_HostAddress}}/api/auth/test
+Accept: application/json
+
+###
+
+### 📝 Register a new user
+POST {{API_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "goose",
+  "email": "goose@pond.com",
+  "password": "honkhonk123"
+}
+
+###
+
+### 🔐 Login with existing user
+POST {{API_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "goose",
+  "password": "honkhonk123"
+}
+
+###
+
+
+###

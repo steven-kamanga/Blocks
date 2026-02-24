@@ -1,0 +1,141 @@
+.page[b-pui3qmsk44] {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #0d0d0d;
+    color: #e0e0e0;
+}
+
+main[b-pui3qmsk44] {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-bar[b-pui3qmsk44] {
+    background: #1a1a1a;
+    color: #e0e0e0;
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid #333;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.top-bar-content[b-pui3qmsk44] {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.page-location[b-pui3qmsk44] {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.user-info[b-pui3qmsk44] {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-details[b-pui3qmsk44] {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.2;
+}
+
+.user-name[b-pui3qmsk44] {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #fff;
+}
+
+.user-email[b-pui3qmsk44] {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.btn-logout[b-pui3qmsk44] {
+    background: transparent;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    padding: 0.5rem 1rem;
+    border-radius: 0;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.15s ease;
+}
+
+.btn-logout:hover[b-pui3qmsk44] {
+    background: #333;
+    border-color: #555;
+    color: #fff;
+}
+
+.sidebar[b-pui3qmsk44] {
+    background: #1a1a1a;
+    border-right: 1px solid #333;
+}
+
+.content[b-pui3qmsk44] {
+    padding: 2rem;
+    flex: 1;
+    background: #0d0d0d;
+    overflow-y: auto;
+}
+
+@media (max-width: 640.98px) {
+    .content[b-pui3qmsk44] {
+        padding: 1rem;
+    }
+}
+
+@media (min-width: 641px) {
+    .page[b-pui3qmsk44] {
+        flex-direction: column;
+    }
+
+    .sidebar[b-pui3qmsk44] {
+        width: 280px;
+        min-height: 100vh;
+        flex-shrink: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
+
+    main[b-pui3qmsk44] {
+        margin-left: 280px;
+    }
+
+    .content[b-pui3qmsk44] {
+        padding: 2rem 3rem;
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+#blazor-error-ui[b-pui3qmsk44] {
+    background: #fafafa;
+    border-top: 1px solid #e0e0e0;
+    bottom: 0;
+    box-sizing: border-box;
+    display: none;
+    left: 0;
+    padding: 0.75rem 1.5rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss[b-pui3qmsk44] {
+    cursor: pointer;
+    position: absolute;
+    right: 1rem;
+    top: 0.5rem;
+}

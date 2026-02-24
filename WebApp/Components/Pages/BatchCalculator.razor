@@ -1,0 +1,471 @@
+@page "/batch-calculator"
+@rendermode InteractiveServer
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Batches</h1>
+        <p class="page-subtitle">Track block batches and quantities</p>
+    </div>
+    <button class="btn btn-primary" @onclick="OpenCreateModal">+ New Batch</button>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Batches</div>
+        <div class="stat-value">@_totalCount</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Blocks</div>
+        <div class="stat-value">@_batches.Sum(b => b.Quantity ?? 0).ToString("N0")</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Avg per Batch</div>
+        <div class="stat-value">@(_batches.Count > 0 ? (_batches.Sum(b => b.Quantity ?? 0) /
+                        _batches.Count).ToString("N0") : "0")</div>
+        </div>
+    </div>
+
+    @if (_isLoading)
+    {
+        <div class="loading">
+            <div class="spinner"></div>
+            Loading batches...
+        </div>
+    }
+    else if (_batches.Count == 0)
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">[ ]</div>
+            <p>No batches yet</p>
+            <button class="btn" @onclick="OpenCreateModal">Create your first batch</button>
+        </div>
+    }
+    else
+    {
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Batch Name</th>
+                        <th>Mix Ratio</th>
+                        <th>Quantity</th>
+                        <th>Machine</th>
+                        <th>Created</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var batch in _batches)
+                    {
+                        <tr>
+                            <td class="text-mono">@batch.Id.ToString("D3")</td>
+                            <td>@batch.BatchName</td>
+                            <td class="text-muted">@batch.CementRatio:@batch.SandRatio:@batch.AggregateRatio</td>
+                            <td class="text-mono">@((batch.Quantity ?? 0).ToString("N0"))</td>
+                            <td class="text-muted">@(batch.MachineName ?? "-")</td>
+                            <td class="text-muted">@batch.CreatedAt.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <div class="actions">
+                                    <button class="btn btn-sm btn-ghost" @onclick="() => ViewBatch(batch)">View</button>
+                                    <button class="btn btn-sm btn-ghost" @onclick="() => OpenEditModal(batch)">Edit</button>
+                                    <button class="btn btn-sm btn-ghost btn-danger"
+                                            @onclick="() => OpenDeleteModal(batch)">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    @if (_totalCount > 0)
+                    {
+                        <tr>
+                            <td colspan="7">
+                                <div class="pagination d-flex flex-row align-items-center">
+                                    <button class="btn btn-sm btn-ghost" disabled="@(!_hasPreviousPage)"
+                                            @onclick="PreviousPage">&lt;
+                                        Prev</button>
+                                        @for (int i = 1; i <= _totalPages; i++)
+                                        {
+                                            var pageNum = i;
+                                            <button class="btn btn-sm @(pageNum == _currentPage ? "btn-primary" : "btn-ghost")"
+                                                    @onclick="() => GoToPage(pageNum)">@pageNum</button>
+                                        }
+                                        <button class="btn btn-sm btn-ghost" disabled="@(!_hasNextPage)" @onclick="NextPage">Next
+                                            &gt;</button>
+                                            <span class="pagination-info">Page @_currentPage of @_totalPages (@_totalCount total)</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tfoot>
+                    </table>
+                </div>
+            }
+
+            @if (_showCreateModal)
+            {
+                <div class="app-modal-backdrop" @onclick="CloseCreateModal">
+                    <div class="app-modal app-modal-wide" @onclick:stopPropagation="true">
+                        <div class="app-modal-header">
+                            <h3 class="app-modal-title">New Batch - Step @_currentStep of 4</h3>
+                            <button class="btn btn-ghost btn-sm" @onclick="CloseCreateModal">x</button>
+                        </div>
+
+                        <div class="step-indicators">
+                            <div class="step-item @(_currentStep >= 1 ? "step-active" : "")">
+                                <span class="step-number">1</span>
+                                <span class="step-label">Info</span>
+                            </div>
+                            <div class="step-line @(_currentStep >= 2 ? "step-line-active" : "")"></div>
+                            <div class="step-item @(_currentStep >= 2 ? "step-active" : "")">
+                                <span class="step-number">2</span>
+                                <span class="step-label">Mix Ratio</span>
+                            </div>
+                            <div class="step-line @(_currentStep >= 3 ? "step-line-active" : "")"></div>
+                            <div class="step-item @(_currentStep >= 3 ? "step-active" : "")">
+                                <span class="step-number">3</span>
+                                <span class="step-label">Materials</span>
+                            </div>
+                            <div class="step-line @(_currentStep >= 4 ? "step-line-active" : "")"></div>
+                            <div class="step-item @(_currentStep >= 4 ? "step-active" : "")">
+                                <span class="step-number">4</span>
+                                <span class="step-label">Output</span>
+                            </div>
+                        </div>
+
+                        <div class="app-modal-body">
+                            @if (!string.IsNullOrEmpty(_errorMessage))
+                            {
+                                <div class="message message-error">@_errorMessage</div>
+                            }
+
+                            @if (_currentStep == 1)
+                            {
+                                <div class="form-group">
+                                    <label class="form-label">Batch Name</label>
+                                    <input type="text" class="form-input" @bind="_newBatch.BatchName"
+                                           placeholder="e.g., Morning Batch 001" />
+                                    <small class="form-hint">Give this batch a unique identifier</small>
+                                </div>
+                            }
+
+                            @if (_currentStep == 2)
+                            {
+                                <p class="step-description">Standard mix ratios for concrete blocks (Cement : Sand : Aggregate)</p>
+                                <div class="ratio-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Cement</label>
+                                        <input type="number" class="form-input" @bind="_newBatch.CementRatio" min="1" />
+                                    </div>
+                                    <div class="ratio-separator">:</div>
+                                    <div class="form-group">
+                                        <label class="form-label">Sand</label>
+                                        <input type="number" class="form-input" @bind="_newBatch.SandRatio" min="1" />
+                                    </div>
+                                    <div class="ratio-separator">:</div>
+                                    <div class="form-group">
+                                        <label class="form-label">Aggregate</label>
+                                        <input type="number" class="form-input" @bind="_newBatch.AggregateRatio" min="1" />
+                                    </div>
+                                </div>
+                                <div class="preset-ratios">
+                                    <span class="form-hint">Quick presets:</span>
+                                    <button type="button" class="btn btn-sm" @onclick='() => SetRatio(1, 2, 4)'>1:2:4</button>
+                                    <button type="button" class="btn btn-sm" @onclick='() => SetRatio(1, 3, 6)'>1:3:6</button>
+                                    <button type="button" class="btn btn-sm" @onclick='() => SetRatio(1, 2, 3)'>1:2:3</button>
+                                </div>
+                            }
+
+                            @if (_currentStep == 3)
+                            {
+                                <p class="step-description">Enter the amount of materials used for this batch</p>
+                                <div class="materials-grid">
+                                    @{
+                                        var cementStock = GetMaterial("Cement")?.StockQuantity ?? 0;
+                                        var sandStock = GetMaterial("Sand")?.StockQuantity ?? 0;
+                                        var aggregateStock = GetMaterial("Aggregate")?.StockQuantity ?? 0;
+                                        var waterStock = GetMaterial("Water")?.StockQuantity ?? 0;
+                                    }
+                                    <div class="form-group">
+                                        <label class="form-label">Cement (kg)</label>
+                                        <input type="number" class="form-input" @bind="_newBatch.CementUsed" min="0" step="0.1" />
+                                        <small
+                                            class="form-hint stock-hint @(cementStock < _newBatch.CementUsed ? "stock-low" : "")">Available:
+                                            @cementStock.ToString("N0") kg</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Sand (kg)</label>
+                                            <input type="number" class="form-input" @bind="_newBatch.SandUsed" min="0" step="0.1" />
+                                            <small class="form-hint stock-hint @(sandStock < _newBatch.SandUsed ? "stock-low" : "")">Available:
+                                                @sandStock.ToString("N0") kg</small>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Aggregate (kg)</label>
+                                                <input type="number" class="form-input" @bind="_newBatch.AggregateUsed" min="0" step="0.1" />
+                                                <small
+                                                    class="form-hint stock-hint @(aggregateStock < _newBatch.AggregateUsed ? "stock-low" : "")">Available:
+                                                    @aggregateStock.ToString("N0") kg</small>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">Water (liters)</label>
+                                                    <input type="number" class="form-input" @bind="_newBatch.WaterUsed" min="0" step="0.1" />
+                                                    <small
+                                                        class="form-hint stock-hint @(waterStock < _newBatch.WaterUsed ? "stock-low" : "")">Available:
+                                                        @waterStock.ToString("N0") L</small>
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            @if (_currentStep == 4)
+                                            {
+                                                <p class="step-description">Select the machine and review estimated output</p>
+                                                <div class="form-group">
+                                                    <label class="form-label">Machine</label>
+                                                    <select class="form-input" @onchange="OnMachineChanged">
+                                                        <option value="">-- Select Machine --</option>
+                                                        @foreach (var machine in _machines.Where(m => m.IsActive))
+                                                        {
+                                                            <option value="@machine.Id" selected="@(_newBatch.MachineId == machine.Id)">@machine.Name
+                                                                (@machine.BlocksPerBatch blocks/cycle)</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+
+                                                    @if (_isCalculating)
+                                                    {
+                                                        <div class="calc-panel">
+                                                            <div class="spinner-sm"></div> Calculating...
+                                                        </div>
+                                                    }
+                                                    else if (_calculation != null)
+                                                    {
+                                                        <div class="calc-panel">
+                                                            <h4 class="calc-title">Estimated Output</h4>
+                                                            <div class="calc-grid">
+                                                                <div class="calc-item">
+                                                                    <span class="calc-label">Estimated Blocks</span>
+                                                                    <span class="calc-value">@_calculation.EstimatedBlocks.ToString("N0")</span>
+                                                                </div>
+                                                                @if (_calculation.EstimatedCycles > 0)
+                                                                {
+                                                                    <div class="calc-item">
+                                                                        <span class="calc-label">Machine Cycles</span>
+                                                                        <span class="calc-value">@_calculation.EstimatedCycles</span>
+                                                                    </div>
+                                                                }
+                                                                <div class="calc-item">
+                                                                    <span class="calc-label">Total Mix Weight</span>
+                                                                    <span class="calc-value">@_calculation.TotalMixWeight.ToString("N1") kg</span>
+                                                                </div>
+                                                            </div>
+                                                            @if (_calculation.Warnings.Any())
+                                                            {
+                                                                <div class="calc-warnings">
+                                                                    @foreach (var warning in _calculation.Warnings)
+                                                                    {
+                                                                        <div class="calc-warning">! @warning</div>
+                                                                    }
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    }
+
+                                                    <div class="form-group">
+                                                        <label class="form-label">Actual Blocks Produced</label>
+                                                        <input type="number" class="form-input" @bind="_newBatch.Quantity" min="0" />
+                                                        <small class="form-hint">Enter actual count or use estimate above</small>
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <div class="app-modal-footer">
+                                                @if (_currentStep > 1)
+                                                {
+                                                    <button class="btn" @onclick="PrevStep">Back</button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn" @onclick="CloseCreateModal">Cancel</button>
+                                                }
+
+                                                @if (_currentStep < 4)
+                                                {
+                                                    <button class="btn btn-primary" @onclick="NextStep">Next</button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-primary" @onclick="CreateBatch" disabled="@_isSaving">
+                                                        @(_isSaving ? "Creating..." : "Create Batch")
+                                                    </button>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (_showViewModal && _selectedBatch != null)
+                                {
+                                    <div class="app-modal-backdrop" @onclick="CloseViewModal">
+                                        <div class="app-modal" @onclick:stopPropagation="true">
+                                            <div class="app-modal-header">
+                                                <h3 class="app-modal-title">Batch Details</h3>
+                                                <button class="btn btn-ghost btn-sm" @onclick="CloseViewModal">x</button>
+                                            </div>
+                                            <div class="app-modal-body">
+                                                <div class="detail-section">
+                                                    <h4 class="detail-section-title">Basic Info</h4>
+                                                    <div class="detail-grid">
+                                                        <div class="detail-item">
+                                                            <span class="detail-label">ID</span>
+                                                            <span class="detail-value text-mono">@_selectedBatch.Id.ToString("D3")</span>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <span class="detail-label">Batch Name</span>
+                                                            <span class="detail-value">@_selectedBatch.BatchName</span>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <span class="detail-label">Created</span>
+                                                            <span class="detail-value text-muted">@_selectedBatch.CreatedAt.ToString("yyyy-MM-dd                            HH:mm")</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="detail-section">
+                                                    <h4 class="detail-section-title">Mix & Materials</h4>
+                                                    <div class="detail-grid">
+                                                        <div class="detail-item">
+                                                            <span class="detail-label">Mix Ratio</span>
+                                                            <span
+                                                            class="detail-value text-mono">@_selectedBatch.CementRatio:@_selectedBatch.SandRatio:@_selectedBatch.AggregateRatio</span>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <span class="detail-label">Cement Used</span>
+                                                            <span class="detail-value text-mono">@_selectedBatch.CementUsed.ToString("N1")</span>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <span class="detail-label">Sand Used</span>
+                                                            <span class="detail-value text-mono">@_selectedBatch.SandUsed.ToString("N1")</span>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <span class="detail-label">Aggregate Used</span>
+                                                            <span class="detail-value text-mono">@_selectedBatch.AggregateUsed.ToString("N1")</span>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <span class="detail-label">Water Used</span>
+                                                            <span class="detail-value text-mono">@_selectedBatch.WaterUsed.ToString("N1") L</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="detail-section">
+                                                    <h4 class="detail-section-title">Output</h4>
+                                                    <div class="detail-grid">
+                                                        <div class="detail-item">
+                                                            <span class="detail-label">Machine</span>
+                                                            <span class="detail-value">@(_selectedBatch.MachineName ?? "Not specified")</span>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <span class="detail-label">Blocks Produced</span>
+                                                            <span class="detail-value text-mono">@((_selectedBatch.Quantity ?? 0).ToString("N0"))</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="app-modal-footer">
+                                                <button class="btn" @onclick="CloseViewModal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (_showEditModal && _editBatch != null)
+                                {
+                                    <div class="app-modal-backdrop" @onclick="CloseEditModal">
+                                        <div class="app-modal" @onclick:stopPropagation="true">
+                                            <div class="app-modal-header">
+                                                <h3 class="app-modal-title">Edit Batch</h3>
+                                                <button class="btn btn-ghost btn-sm" @onclick="CloseEditModal">x</button>
+                                            </div>
+                                            <div class="app-modal-body">
+                                                @if (!string.IsNullOrEmpty(_errorMessage))
+                                                {
+                                                    <div class="message message-error">@_errorMessage</div>
+                                                }
+                                                <div class="form-grid">
+                                                    <div class="form-group full-width">
+                                                        <label class="form-label">Batch Name</label>
+                                                        <input type="text" class="form-input" @bind="_editRequest.BatchName"
+                                                               placeholder="Enter batch name" />
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="form-label">Cement Ratio</label>
+                                                        <input type="number" class="form-input" @bind="_editRequest.CementRatio" min="1" />
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="form-label">Sand Ratio</label>
+                                                        <input type="number" class="form-input" @bind="_editRequest.SandRatio" min="1" />
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="form-label">Aggregate Ratio</label>
+                                                        <input type="number" class="form-input" @bind="_editRequest.AggregateRatio" min="1" />
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="form-label">Cement Used</label>
+                                                        <input type="number" class="form-input" @bind="_editRequest.CementUsed" min="0" step="0.1" />
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="form-label">Sand Used</label>
+                                                        <input type="number" class="form-input" @bind="_editRequest.SandUsed" min="0" step="0.1" />
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="form-label">Aggregate Used</label>
+                                                        <input type="number" class="form-input" @bind="_editRequest.AggregateUsed" min="0" step="0.1" />
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="form-label">Quantity (Blocks)</label>
+                                                        <input type="number" class="form-input" @bind="_editRequest.Quantity" min="0" />
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="form-label">Machine</label>
+                                                        <select class="form-input" @bind="_editRequest.MachineId">
+                                                            <option value="">No machine</option>
+                                                            @foreach (var machine in _machines.Where(m => m.IsActive))
+                                                            {
+                                                                <option value="@machine.Id">@machine.Name (@machine.BlockSize)</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="app-modal-footer">
+                                                <button class="btn" @onclick="CloseEditModal">Cancel</button>
+                                                <button class="btn btn-primary" @onclick="UpdateBatch" disabled="@_isSaving">
+                                                    @(_isSaving ? "Saving..." : "Save Changes")
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (_showDeleteModal && _batchToDelete != null)
+                                {
+                                    <div class="app-modal-backdrop" @onclick="CloseDeleteModal">
+                                        <div class="app-modal" @onclick:stopPropagation="true">
+                                            <div class="app-modal-header">
+                                                <h3 class="app-modal-title">Delete Batch</h3>
+                                                <button class="btn btn-ghost btn-sm" @onclick="CloseDeleteModal">x</button>
+                                            </div>
+                                            <div class="app-modal-body">
+                                                <p>Are you sure you want to delete <strong>@_batchToDelete.BatchName</strong>?</p>
+                                                <p class="text-muted">This action cannot be undone.</p>
+                                            </div>
+                                            <div class="app-modal-footer">
+                                                <button class="btn" @onclick="CloseDeleteModal">Cancel</button>
+                                                <button class="btn btn-danger" @onclick="DeleteBatch" disabled="@_isSaving">
+                                                    @(_isSaving ? "Deleting..." : "Delete")
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }

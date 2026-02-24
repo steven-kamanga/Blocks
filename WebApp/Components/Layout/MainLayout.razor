@@ -1,0 +1,91 @@
+﻿@inherits LayoutComponentBase
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject WebApp.Services.CustomAuthStateProvider AuthStateProvider
+@inject WebApp.Services.IAuthService AuthService
+@inject WebApp.ViewModels.MainLayoutViewModel VM
+@inject IJSRuntime JS
+
+<div class="page">
+    <aside class="sidebar">
+        <NavMenu />
+    </aside>
+
+    <main>
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <span class="page-location"></span>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="user-info">
+                            @if (!string.IsNullOrEmpty(VM.Username))
+                            {
+                                <div class="user-details">
+                                    <span class="user-name">@VM.Username</span>
+                                    <span class="user-email">@VM.Email</span>
+                                </div>
+                            }
+                        </div>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        <li>
+                            <a href="/profile"><button class="btn-logout w-100">Profile</button></a>
+                        </li>
+                        <li>
+                            <button class="btn-logout w-100" @onclick="Logout">Logout</button>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+        <article class="content">
+            @Body
+        </article>
+    </main>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">x</span>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        AuthStateProvider.AuthenticationStateChanged += OnAuthStateChanged;
+    }
+
+    private async void OnAuthStateChanged(Task<Microsoft.AspNetCore.Components.Authorization.AuthenticationState> task)
+    {
+        await InvokeAsync(async () =>
+        {
+            await VM.LoadUserInfoAsync();
+            StateHasChanged();
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await VM.LoadUserInfoAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        await JS.InvokeVoidAsync("eval", "document.cookie='auth_session=;path=/;max-age=0'");
+        AuthStateProvider.NotifyAuthenticationStateChanged();
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
+
+    public void Dispose()
+    {
+        AuthStateProvider.AuthenticationStateChanged -= OnAuthStateChanged;
+    }
+}

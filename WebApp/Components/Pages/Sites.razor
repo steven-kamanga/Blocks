@@ -1,0 +1,218 @@
+@page "/site"
+@rendermode InteractiveServer
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Sites</h1>
+        <p class="page-subtitle">Manage construction sites</p>
+    </div>
+    <button class="btn btn-primary" @onclick="OpenCreateModal">+ New Site</button>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Sites</div>
+        <div class="stat-value">@_totalCount</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">This Month</div>
+        <div class="stat-value">@_sites.Count(s => s.CreatedAt.Month == DateTime.Now.Month)</div>
+    </div>
+</div>
+
+@if (_isLoading)
+{
+    <div class="loading">
+        <div class="spinner"></div>
+        Loading sites...
+    </div>
+}
+else if (_sites.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-state-icon">[ ]</div>
+        <p>No sites yet</p>
+        <button class="btn" @onclick="OpenCreateModal">Create your first site</button>
+    </div>
+}
+else
+{
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Created</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var site in _sites)
+                {
+                    <tr>
+                        <td class="text-mono">@site.Id.ToString("D3")</td>
+                        <td>@site.Name</td>
+                        <td class="text-muted">@site.Location</td>
+                        <td class="text-muted">@site.CreatedAt.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn btn-sm btn-ghost" @onclick="() => ViewSite(site)">View</button>
+                                <button class="btn btn-sm btn-ghost" @onclick="() => OpenEditModal(site)">Edit</button>
+                                <button class="btn btn-sm btn-ghost btn-danger"
+                                        @onclick="() => OpenDeleteModal(site)">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (_totalCount > 0)
+    {
+        <div class="pagination">
+            <button class="btn btn-sm btn-ghost" disabled="@(!_hasPreviousPage)" @onclick="PreviousPage">&lt; Prev</button>
+            @for (int i = 1; i <= _totalPages; i++)
+            {
+                var pageNum = i;
+                <button class="btn btn-sm @(pageNum == _currentPage ? "btn-primary" : "btn-ghost")"
+                        @onclick="() => GoToPage(pageNum)">@pageNum</button>
+            }
+            <button class="btn btn-sm btn-ghost" disabled="@(!_hasNextPage)" @onclick="NextPage">Next &gt;</button>
+            <span class="pagination-info">Page @_currentPage of @_totalPages (@_totalCount total)</span>
+        </div>
+    }
+}
+
+@if (_showCreateModal)
+{
+    <div class="app-modal-backdrop" @onclick="CloseCreateModal">
+        <div class="app-modal" @onclick:stopPropagation="true">
+            <div class="app-modal-header">
+                <h3 class="app-modal-title">New Site</h3>
+                <button class="btn btn-ghost btn-sm" @onclick="CloseCreateModal">x</button>
+            </div>
+            <div class="app-modal-body">
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="message message-error">@_errorMessage</div>
+                }
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Site Name</label>
+                        <input type="text" class="form-input" @bind="_newSite.Name" placeholder="Enter site name" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-input" @bind="_newSite.Location" placeholder="Enter location" />
+                    </div>
+                </div>
+            </div>
+            <div class="app-modal-footer">
+                <button class="btn" @onclick="CloseCreateModal">Cancel</button>
+                <button class="btn btn-primary" @onclick="CreateSite" disabled="@_isSaving">
+                    @if (_isSaving)
+                    {
+                        <span>Saving...</span>
+                    }
+                    else
+                    {
+
+                        <span>Create Site</span>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (_showViewModal && _selectedSite != null)
+{
+    <div class="app-modal-backdrop" @onclick="CloseViewModal">
+        <div class="app-modal" @onclick:stopPropagation="true">
+            <div class="app-modal-header">
+                <h3 class="app-modal-title">Site Details</h3>
+                <button class="btn btn-ghost btn-sm" @onclick="CloseViewModal">x</button>
+            </div>
+            <div class="app-modal-body">
+                <div class="form-group">
+                    <label class="form-label">ID</label>
+                    <p class="text-mono">@_selectedSite.Id.ToString("D3")</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <p>@_selectedSite.Name</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <p>@_selectedSite.Location</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Created At</label>
+                    <p class="text-muted">@_selectedSite.CreatedAt.ToString("yyyy-MM-dd HH:mm")</p>
+                </div>
+            </div>
+            <div class="app-modal-footer">
+                <button class="btn" @onclick="CloseViewModal">Close</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (_showEditModal && _editSite != null)
+{
+    <div class="app-modal-backdrop" @onclick="CloseEditModal">
+        <div class="app-modal" @onclick:stopPropagation="true">
+            <div class="app-modal-header">
+                <h3 class="app-modal-title">Edit Site</h3>
+                <button class="btn btn-ghost btn-sm" @onclick="CloseEditModal">x</button>
+            </div>
+            <div class="app-modal-body">
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="message message-error">@_errorMessage</div>
+                }
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Site Name</label>
+                        <input type="text" class="form-input" @bind="_editRequest.Name" placeholder="Enter site name" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-input" @bind="_editRequest.Location" placeholder="Enter location" />
+                    </div>
+                </div>
+            </div>
+            <div class="app-modal-footer">
+                <button class="btn" @onclick="CloseEditModal">Cancel</button>
+                <button class="btn btn-primary" @onclick="UpdateSite" disabled="@_isSaving">
+                    @(_isSaving ? "Saving..." : "Save Changes")
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (_showDeleteModal && _siteToDelete != null)
+{
+    <div class="app-modal-backdrop" @onclick="CloseDeleteModal">
+        <div class="app-modal" @onclick:stopPropagation="true">
+            <div class="app-modal-header">
+                <h3 class="app-modal-title">Delete Site</h3>
+                <button class="btn btn-ghost btn-sm" @onclick="CloseDeleteModal">x</button>
+            </div>
+            <div class="app-modal-body">
+                <p>Are you sure you want to delete <strong>@_siteToDelete.Name</strong>?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="app-modal-footer">
+                <button class="btn" @onclick="CloseDeleteModal">Cancel</button>
+                <button class="btn btn-danger" @onclick="DeleteSite" disabled="@_isSaving">
+                    @(_isSaving ? "Deleting..." : "Delete")
+                </button>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,44 @@
+﻿@using WebApp.Services
+
+<input type="checkbox" id="nav-toggle" class="nav-toggle" />
+
+<label for="nav-toggle" class="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+</label>
+
+<label for="nav-toggle" class="overlay"></label>
+
+<div class="sidebar-nav">
+    <div class="top-row">
+        <a class="navbar-brand" href="">BLOCKS</a>
+    </div>
+    <nav class="nav flex-column">
+        <div class="nav-item">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="nav-icon">🏠</span> Home
+            </NavLink>
+        </div>
+        <div class="nav-item">
+            <NavLink class="nav-link" href="site">
+                <span class="nav-icon">📍</span> Sites
+            </NavLink>
+        </div>
+        <div class="nav-item">
+            <NavLink class="nav-link" href="batch-calculator">
+                <span class="nav-icon">📦</span> Batches
+            </NavLink>
+        </div>
+        <div class="nav-item">
+            <NavLink class="nav-link" href="materials">
+                <span class="nav-icon">🧱</span> Materials
+            </NavLink>
+        </div>
+        <div class="nav-item">
+            <NavLink class="nav-link" href="machines">
+                <span class="nav-icon">⚙️</span> Machines
+            </NavLink>
+        </div>
+    </nav>
+</div>
