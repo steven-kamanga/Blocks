@@ -1,4 +1,5 @@
 @page "/machines"
+@using WebApp.Components.Partials.Machines
 @rendermode InteractiveServer
 
 <div class="page-header">
@@ -100,136 +101,9 @@ else
     }
 }
 
-@if (_showCreateModal)
-{
-    <div class="app-modal-backdrop" @onclick="CloseCreateModal">
-        <div class="app-modal" @onclick:stopPropagation="true">
-            <div class="app-modal-header">
-                <h3 class="app-modal-title">Add Machine</h3>
-                <button class="btn btn-ghost btn-sm" @onclick="CloseCreateModal">x</button>
-            </div>
-            <div class="app-modal-body">
-                @if (!string.IsNullOrEmpty(_errorMessage))
-                {
-                    <div class="message message-error">@_errorMessage</div>
-                }
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Machine Name</label>
-                        <input type="text" class="form-input" @bind="_newMachine.Name" placeholder="e.g., Block Press A" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Site</label>
-                        <select class="form-input" @bind="_newMachine.SiteId">
-                            <option value="0">-- Select Site --</option>
-                            @foreach (var site in _sites)
-                            {
-                                <option value="@site.Id">@site.Name</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Block Size (W x H x L inches)</label>
-                        <select class="form-input" @bind="_newMachine.BlockSize">
-                            <option value="4x8x16">4 x 8 x 16</option>
-                            <option value="6x8x16">6 x 8 x 16</option>
-                            <option value="8x8x16">8 x 8 x 16</option>
-                            <option value="12x8x16">12 x 8 x 16</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Blocks per Cycle</label>
-                        <input type="number" class="form-input" @bind="_newMachine.BlocksPerBatch" min="1" />
-                    </div>
-                </div>
-            </div>
-            <div class="app-modal-footer">
-                <button class="btn" @onclick="CloseCreateModal">Cancel</button>
-                <button class="btn btn-primary" @onclick="CreateMachine" disabled="@_isSaving">
-                    @(_isSaving ? "Saving..." : "Add Machine")
-                </button>
-            </div>
-        </div>
-    </div>
-}
-
-@if (_showEditModal && _editMachine != null)
-{
-    <div class="app-modal-backdrop" @onclick="CloseEditModal">
-        <div class="app-modal" @onclick:stopPropagation="true">
-            <div class="app-modal-header">
-                <h3 class="app-modal-title">Edit Machine</h3>
-                <button class="btn btn-ghost btn-sm" @onclick="CloseEditModal">x</button>
-            </div>
-            <div class="app-modal-body">
-                @if (!string.IsNullOrEmpty(_errorMessage))
-                {
-                    <div class="message message-error">@_errorMessage</div>
-                }
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Machine Name</label>
-                        <input type="text" class="form-input" @bind="_editRequest.Name" placeholder="e.g., Block Press A" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Site</label>
-                        <select class="form-input" @bind="_editRequest.SiteId">
-                            @foreach (var site in _sites)
-                            {
-                                <option value="@site.Id">@site.Name</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Block Size (W x H x L inches)</label>
-                        <select class="form-input" @bind="_editRequest.BlockSize">
-                            <option value="4x8x16">4 x 8 x 16</option>
-                            <option value="6x8x16">6 x 8 x 16</option>
-                            <option value="8x8x16">8 x 8 x 16</option>
-                            <option value="12x8x16">12 x 8 x 16</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Blocks per Cycle</label>
-                        <input type="number" class="form-input" @bind="_editRequest.BlocksPerBatch" min="1" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Status</label>
-                        <select class="form-input" @bind="_editRequest.IsActive">
-                            <option value="true">Active</option>
-                            <option value="false">Inactive</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="app-modal-footer">
-                <button class="btn" @onclick="CloseEditModal">Cancel</button>
-                <button class="btn btn-primary" @onclick="UpdateMachine" disabled="@_isSaving">
-                    @(_isSaving ? "Saving..." : "Save Changes")
-                </button>
-            </div>
-        </div>
-    </div>
-}
-
-@if (_showDeleteModal && _machineToDelete != null)
-{
-    <div class="app-modal-backdrop" @onclick="CloseDeleteModal">
-        <div class="app-modal" @onclick:stopPropagation="true">
-            <div class="app-modal-header">
-                <h3 class="app-modal-title">Delete Machine</h3>
-                <button class="btn btn-ghost btn-sm" @onclick="CloseDeleteModal">x</button>
-            </div>
-            <div class="app-modal-body">
-                <p>Are you sure you want to delete <strong>@_machineToDelete.Name</strong>?</p>
-                <p class="text-muted">This action cannot be undone.</p>
-            </div>
-            <div class="app-modal-footer">
-                <button class="btn" @onclick="CloseDeleteModal">Cancel</button>
-                <button class="btn btn-danger" @onclick="DeleteMachine" disabled="@_isSaving">
-                    @(_isSaving ? "Deleting..." : "Delete")
-                </button>
-            </div>
-        </div>
-    </div>
-}
+<_CreateMachineModal OnClose="CloseCreateModal" Show="@_showCreateModal" ErrorMessage="@_errorMessage"
+                     NewMachine="@_newMachine" Saving="@_isSaving" CreateMachine="CreateMachine" Sites="@_sites" />
+<_UpdateMachineModal OnClose="CloseEditModal" Show="@_showEditModal" ErrorMessage="@_errorMessage"
+                     EditRequest="@_editRequest" IsSaving="@_isSaving" UpdateMachine="UpdateMachine" Sites="@_sites" />
+<_DeleteMachineModal Show="@_showDeleteModal" MachineToDelete="@_machineToDelete" IsSaving="@_isSaving"
+                     OnDelete="DeleteMachine" OnClose="CloseDeleteModal" />

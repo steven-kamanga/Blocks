@@ -78,6 +78,42 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xXZWF0aGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/DELL/RiderProjects/Blocks/WebApp/Components/Partials/BatchCalculator/_CreateBatchModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYXJ0aWFsc1xCYXRjaENhbGN1bGF0b3JcX0NyZWF0ZUJhdGNoTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/DELL/RiderProjects/Blocks/WebApp/Components/Partials/BatchCalculator/_DeteleBatchModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYXJ0aWFsc1xCYXRjaENhbGN1bGF0b3JcX0RldGVsZUJhdGNoTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/DELL/RiderProjects/Blocks/WebApp/Components/Partials/Machines/_CreateMachineModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYXJ0aWFsc1xNYWNoaW5lc1xfQ3JlYXRlTWFjaGluZU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/DELL/RiderProjects/Blocks/WebApp/Components/Partials/Machines/_DeleteMachineModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYXJ0aWFsc1xNYWNoaW5lc1xfRGVsZXRlTWFjaGluZU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/DELL/RiderProjects/Blocks/WebApp/Components/Partials/Machines/_UpdateMachineModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYXJ0aWFsc1xNYWNoaW5lc1xfVXBkYXRlTWFjaGluZU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/DELL/RiderProjects/Blocks/WebApp/Components/Partials/Materials/_CreateMaterialsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYXJ0aWFsc1xNYXRlcmlhbHNcX0NyZWF0ZU1hdGVyaWFsc01vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/DELL/RiderProjects/Blocks/WebApp/Components/Partials/Materials/_DeleteMaterialsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYXJ0aWFsc1xNYXRlcmlhbHNcX0RlbGV0ZU1hdGVyaWFsc01vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/DELL/RiderProjects/Blocks/WebApp/Components/Partials/Materials/_ShowMaterialsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYXJ0aWFsc1xNYXRlcmlhbHNcX1Nob3dNYXRlcmlhbHNNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/DELL/RiderProjects/Blocks/WebApp/Components/Partials/Materials/_UpdateMaterialsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYXJ0aWFsc1xNYXRlcmlhbHNcX1VwZGF0ZU1hdGVyaWFsc01vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/DELL/RiderProjects/Blocks/WebApp/Components/Routes.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb3V0ZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 

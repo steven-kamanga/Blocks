@@ -1,0 +1,53 @@
+@using WebApp.Models
+@if (Show)
+{
+    <div class="app-modal-backdrop" @onclick="OnClose">
+        <div class="app-modal" @onclick:stopPropagation="true">
+            <div class="app-modal-header">
+                <h3 class="app-modal-title">Add Machine</h3>
+                <button class="btn btn-ghost btn-sm" @onclick="OnClose">x</button>
+            </div>
+            <div class="app-modal-body">
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <div class="message message-error">@ErrorMessage</div>
+                }
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Machine Name</label>
+                        <input type="text" class="form-input" @bind="NewMachine.Name" placeholder="e.g., Block Press A" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Site</label>
+                        <select class="form-input" @bind="NewMachine.SiteId">
+                            <option value="0">-- Select Site --</option>
+                            @foreach (var site in Sites)
+                            {
+                                <option value="@site.Id">@site.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Block Size (W x H x L inches)</label>
+                        <select class="form-input" @bind="NewMachine.BlockSize">
+                            <option value="4x8x16">4 x 8 x 16</option>
+                            <option value="6x8x16">6 x 8 x 16</option>
+                            <option value="8x8x16">8 x 8 x 16</option>
+                            <option value="12x8x16">12 x 8 x 16</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Blocks per Cycle</label>
+                        <input type="number" class="form-input" @bind="NewMachine.BlocksPerBatch" min="1" />
+                    </div>
+                </div>
+            </div>
+            <div class="app-modal-footer">
+                <button class="btn" @onclick="OnClose">Cancel</button>
+                <button class="btn btn-primary" @onclick="CreateMachine" disabled="@Saving">
+                    @(Saving ? "Saving..." : "Add Machine")
+                </button>
+            </div>
+        </div>
+    </div>
+}

@@ -1,4 +1,5 @@
 @page "/materials"
+@using WebApp.Components.Partials.Materials
 @rendermode InteractiveServer
 
 <div class="page-header">
@@ -88,144 +89,12 @@ else
             </div>
         }
     }
+    <_CreateMaterialsModal OnClose="CloseCreateModal" Show="@_showCreateModal" ErrorMessage="@_errorMessage"
+                  NewMaterial="@_newMaterial" Saving="@_isSaving" CreateMaterial="CreateMaterial" />
 
-    @if (_showCreateModal)
-    {
-        <div class="app-modal-backdrop" @onclick="CloseCreateModal">
-            <div class="app-modal" @onclick:stopPropagation="true">
-                <div class="app-modal-header">
-                    <h3 class="app-modal-title">Add Material</h3>
-                    <button class="btn btn-ghost btn-sm" @onclick="CloseCreateModal">x</button>
-                </div>
-                <div class="app-modal-body">
-                    @if (!string.IsNullOrEmpty(_errorMessage))
-                    {
-                        <div class="message message-error">@_errorMessage</div>
-                    }
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">Material Name</label>
-                            <input type="text" class="form-input" @bind="_newMaterial.Name" placeholder="e.g., Cement, Sand" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Unit</label>
-                            <select class="form-input" @bind="_newMaterial.Unit">
-                                <option value="kg">kg</option>
-                                <option value="bags">bags</option>
-                                <option value="liters">liters</option>
-                                <option value="tons">tons</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Initial Stock</label>
-                            <input type="number" class="form-input" @bind="_newMaterial.StockQuantity" min="0" step="0.01" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Unit Cost</label>
-                            <input type="number" class="form-input" @bind="_newMaterial.UnitCost" min="0" step="0.01" />
-                        </div>
-                    </div>
-                </div>
-                <div class="app-modal-footer">
-                    <button class="btn" @onclick="CloseCreateModal">Cancel</button>
-                    <button class="btn btn-primary" @onclick="CreateMaterial" disabled="@_isSaving">
-                        @(_isSaving ? "Saving..." : "Add Material")
-                    </button>
-                </div>
-            </div>
-        </div>
-    }
+    <_DeleteMaterialsModal Show="@_showDeleteModal" MaterialToDelete="@_materialToDelete" IsSaving="@_isSaving"
+                  DeleteMaterial="DeleteMaterial" OnClose="CloseDeleteModal" />
 
-    @if (_showStockModal && _selectedMaterial != null)
-    {
-        <div class="app-modal-backdrop" @onclick="CloseStockModal">
-            <div class="app-modal" @onclick:stopPropagation="true">
-                <div class="app-modal-header">
-                    <h3 class="app-modal-title">Update Stock - @_selectedMaterial.Name</h3>
-                    <button class="btn btn-ghost btn-sm" @onclick="CloseStockModal">x</button>
-                </div>
-                <div class="app-modal-body">
-                    <div class="form-group">
-                        <label class="form-label">Current Stock: @_selectedMaterial.StockQuantity
-                            @_selectedMaterial.Unit</label>
-                            <input type="number" class="form-input" @bind="_newStockQuantity" min="0" step="0.01" />
-                        </div>
-                    </div>
-                    <div class="app-modal-footer">
-                        <button class="btn" @onclick="CloseStockModal">Cancel</button>
-                        <button class="btn btn-primary" @onclick="UpdateStock" disabled="@_isSaving">
-                            @(_isSaving ? "Updating..." : "Update Stock")
-                        </button>
-                    </div>
-                </div>
-            </div>
-        }
-
-        @if (_showEditModal && _editMaterial != null)
-        {
-            <div class="app-modal-backdrop" @onclick="CloseEditModal">
-                <div class="app-modal" @onclick:stopPropagation="true">
-                    <div class="app-modal-header">
-                        <h3 class="app-modal-title">Edit Material</h3>
-                        <button class="btn btn-ghost btn-sm" @onclick="CloseEditModal">x</button>
-                    </div>
-                    <div class="app-modal-body">
-                        @if (!string.IsNullOrEmpty(_errorMessage))
-                        {
-                            <div class="message message-error">@_errorMessage</div>
-                        }
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Material Name</label>
-                                <input type="text" class="form-input" @bind="_editRequest.Name" placeholder="e.g., Cement, Sand" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Unit</label>
-                                <select class="form-input" @bind="_editRequest.Unit">
-                                    <option value="kg">kg</option>
-                                    <option value="bags">bags</option>
-                                    <option value="liters">liters</option>
-                                    <option value="tons">tons</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Stock Quantity</label>
-                                <input type="number" class="form-input" @bind="_editRequest.StockQuantity" min="0" step="0.01" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Unit Cost</label>
-                                <input type="number" class="form-input" @bind="_editRequest.UnitCost" min="0" step="0.01" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="app-modal-footer">
-                        <button class="btn" @onclick="CloseEditModal">Cancel</button>
-                        <button class="btn btn-primary" @onclick="UpdateMaterial" disabled="@_isSaving">
-                            @(_isSaving ? "Saving..." : "Save Changes")
-                        </button>
-                    </div>
-                </div>
-            </div>
-        }
-
-        @if (_showDeleteModal && _materialToDelete != null)
-        {
-            <div class="app-modal-backdrop" @onclick="CloseDeleteModal">
-                <div class="app-modal" @onclick:stopPropagation="true">
-                    <div class="app-modal-header">
-                        <h3 class="app-modal-title">Delete Material</h3>
-                        <button class="btn btn-ghost btn-sm" @onclick="CloseDeleteModal">x</button>
-                    </div>
-                    <div class="app-modal-body">
-                        <p>Are you sure you want to delete <strong>@_materialToDelete.Name</strong>?</p>
-                        <p class="text-muted">This action cannot be undone.</p>
-                    </div>
-                    <div class="app-modal-footer">
-                        <button class="btn" @onclick="CloseDeleteModal">Cancel</button>
-                        <button class="btn btn-danger" @onclick="DeleteMaterial" disabled="@_isSaving">
-                            @(_isSaving ? "Deleting..." : "Delete")
-                        </button>
-                    </div>
-                </div>
-            </div>
-        }
+    <_UpdateMaterialsModal Show="@_showEditModal" MaterialToEdit="@_editMaterial" IsSaving="@_isSaving" ErrorMessage="@_errorMessage"
+                  EditRequest="@_editRequest" OnClose="CloseEditModal" UpdateMaterial="UpdateMaterial" />
+    <_ShowMaterialsModal Show="@_showStockModal" SelectedMaterial="@_selectedMaterial" />

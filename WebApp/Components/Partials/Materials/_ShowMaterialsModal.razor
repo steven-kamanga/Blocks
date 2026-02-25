@@ -1,0 +1,25 @@
+@using WebApp.Models
+@if (Show && SelectedMaterial != null)
+{
+    <div class="app-modal-backdrop" @onclick="OnClose">
+        <div class="app-modal" @onclick:stopPropagation="true">
+            <div class="app-modal-header">
+                <h3 class="app-modal-title">Update Stock - @SelectedMaterial.Name</h3>
+                <button class="btn btn-ghost btn-sm" @onclick="OnClose">x</button>
+            </div>
+            <div class="app-modal-body">
+                <div class="form-group">
+                    <label class="form-label">Current Stock: @SelectedMaterial.StockQuantity
+                        @SelectedMaterial.Unit</label>
+                        <input type="number" class="form-input" @bind="NewStockQuantity" min="0" step="0.01" />
+                    </div>
+                </div>
+                <div class="app-modal-footer">
+                    <button class="btn" @onclick="OnClose">Cancel</button>
+                    <button class="btn btn-primary" @onclick="UpdateStock" disabled="@IsSaving">
+                        @(IsSaving ? "Updating..." : "Update Stock")
+                    </button>
+                </div>
+            </div>
+        </div>
+    }

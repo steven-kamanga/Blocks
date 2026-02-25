@@ -90,3 +90,4 @@ C:\Users\DELL\RiderProjects\Blocks\WebApp\obj\Debug\net10.0\compressed\lan9lomf3
 C:\Users\DELL\RiderProjects\Blocks\WebApp\obj\Debug\net10.0\compressed\gkh19mpvac-{0}-bdehlkyo67-bdehlkyo67.gz
 C:\Users\DELL\RiderProjects\Blocks\WebApp\obj\Debug\net10.0\compressed\nrt9wfei13-{0}-vuxxzrag2t-vuxxzrag2t.gz
 C:\Users\DELL\RiderProjects\Blocks\WebApp\obj\Debug\net10.0\compressed\lcaz16i7pu-{0}-vuxxzrag2t-vuxxzrag2t.gz
+C:\Users\DELL\RiderProjects\Blocks\WebApp\obj\Debug\net10.0\WebApp.sourcelink.json

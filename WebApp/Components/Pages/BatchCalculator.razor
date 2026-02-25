@@ -1,4 +1,5 @@
 @page "/batch-calculator"
+@using WebApp.Components.Partials.BatchCalculator
 @rendermode InteractiveServer
 
 <div class="page-header">
@@ -21,7 +22,7 @@
     <div class="stat-card">
         <div class="stat-label">Avg per Batch</div>
         <div class="stat-value">@(_batches.Count > 0 ? (_batches.Sum(b => b.Quantity ?? 0) /
-                        _batches.Count).ToString("N0") : "0")</div>
+                                                                                    _batches.Count).ToString("N0") : "0")</div>
         </div>
     </div>
 
@@ -448,24 +449,5 @@
                                     </div>
                                 }
 
-                                @if (_showDeleteModal && _batchToDelete != null)
-                                {
-                                    <div class="app-modal-backdrop" @onclick="CloseDeleteModal">
-                                        <div class="app-modal" @onclick:stopPropagation="true">
-                                            <div class="app-modal-header">
-                                                <h3 class="app-modal-title">Delete Batch</h3>
-                                                <button class="btn btn-ghost btn-sm" @onclick="CloseDeleteModal">x</button>
-                                            </div>
-                                            <div class="app-modal-body">
-                                                <p>Are you sure you want to delete <strong>@_batchToDelete.BatchName</strong>?</p>
-                                                <p class="text-muted">This action cannot be undone.</p>
-                                            </div>
-                                            <div class="app-modal-footer">
-                                                <button class="btn" @onclick="CloseDeleteModal">Cancel</button>
-                                                <button class="btn btn-danger" @onclick="DeleteBatch" disabled="@_isSaving">
-                                                    @(_isSaving ? "Deleting..." : "Delete")
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
+                                <_DeteleBatchModal Show="@_showDeleteModal" BatchToDelete="@_batchToDelete" OnClose="CloseDeleteModal"
+                                                   OnDeleted="DeleteBatch" />

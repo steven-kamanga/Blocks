@@ -1,0 +1,21 @@
+@if (Show && MachineToDelete != null)
+{
+    <div class="app-modal-backdrop" @onclick="OnClose">
+        <div class="app-modal" @onclick:stopPropagation="true">
+            <div class="app-modal-header">
+                <h3 class="app-modal-title">Delete Machine</h3>
+                <button class="btn btn-ghost btn-sm" @onclick="OnClose">x</button>
+            </div>
+            <div class="app-modal-body">
+                <p>Are you sure you want to delete <strong>@MachineToDelete.Name</strong>?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="app-modal-footer">
+                <button class="btn" @onclick="OnClose">Cancel</button>
+                <button class="btn btn-danger" @onclick="OnDelete" disabled="@IsSaving">
+                    @(IsSaving ? "Deleting..." : "Delete")
+                </button>
+            </div>
+        </div>
+    </div>
+}

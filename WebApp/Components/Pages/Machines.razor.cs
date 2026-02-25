@@ -10,7 +10,6 @@ public partial class Machines : ComponentBase
     [Inject] private MachinesViewModel VM { get; set; } = default!;
     [Inject] private CustomAuthStateProvider AuthStateProvider { get; set; } = default!;
 
-    // Expose VM state (razor stays unchanged)
     private List<MachineDto> _machines => VM.Machines;
     private List<SiteDto> _sites => VM.Sites;
     private bool _isLoading => VM.IsLoading;
@@ -24,7 +23,6 @@ public partial class Machines : ComponentBase
     private bool _showEditModal => VM.ShowEditModal;
     private bool _showDeleteModal => VM.ShowDeleteModal;
 
-    // Pagination
     private int _currentPage => VM.CurrentPage;
     private int _totalPages => VM.TotalPages;
     private int _totalCount => VM.TotalCount;

@@ -10,7 +10,6 @@ public partial class Sites : ComponentBase
     [Inject] private SitesViewModel VM { get; set; } = default!;
     [Inject] private CustomAuthStateProvider AuthStateProvider { get; set; } = default!;
 
-    // Expose VM state (razor stays unchanged)
     private List<SiteDto> _sites => VM.Sites;
     private bool _isLoading => VM.IsLoading;
     private bool _isSaving => VM.IsSaving;
